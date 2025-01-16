@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
-
+from selenium.webdriver.support import expected_conditions as EC
 
 # no modificar
 def retrieve_phone_code(driver) -> str:
@@ -42,7 +42,7 @@ class UrbanRoutesPage:
     to_field = (By.ID, 'to')
     select_taxi_button = (By.XPATH, './/div[@class="results-text"]/button[text()="Pedir un taxi"]')
     comfort_button = (By.XPATH, ".//div[@class='tariff-cards']/div[5]")
-    comfort_button_active = (By.CSS_SELECTOR, "div.tcard.active")
+    comfort_button_active = (By.XPATH, "//div[@class='tariff-picker shown']//div[@class='tariff-cards']//div[@class='tcard active']//div[@class='tcard-title']")
     phone_number_button = (By.CLASS_NAME, 'np-button')
     phone_number_input = (By.ID, 'phone')
     phone_next_button = (By.XPATH, ".//form/div[@class='buttons']/button[text()='Siguiente']")
@@ -65,7 +65,8 @@ class UrbanRoutesPage:
     order_info_popup = (By.CLASS_NAME, 'order-body')
     order_info_text = (By.XPATH, ".//div[@class='order-header']/div/div[@class='order-header-title']")
     order_info_number = (By.CLASS_NAME, 'order-number')
-    order_info_driver = (By.XPATH, '//*[@id="root"]/div/div[5]/div[2]/div[2]/div[1]/div[1]/div[2]')
+    #Correccion de selector
+    order_info_driver = (By.XPATH, ".//div[@class='order-btn-group']")
 
     def __init__(self, driver):
         self.driver = driver
@@ -281,6 +282,12 @@ class TestUrbanRoutes:
         routes_page.click_comfort_fee()
 
         assert routes_page.get_active_comfort_state()
+        #Correccion donde está el botón Comfort y  el texto del elemento con la clase tcard-title sea igual“Comfort”
+        comfort_category = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, '.tcard.active .tcard-title'))
+        )
+        assert comfort_category.text== "Comfort"
+
         self.driver.close()
 
     def test_add_phone_number(self):
